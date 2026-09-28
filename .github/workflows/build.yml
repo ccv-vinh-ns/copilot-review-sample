@@ -49,5 +49,5 @@ jobs:
         shell: powershell
         run: |
           ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"ccv-vinh-ns_copilot-review-sample" /o:"ccv-vinh-ns" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          dotnet build TokenAPI.sln
+          dotnet build TokenAPI/TokenAPI.sln
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
