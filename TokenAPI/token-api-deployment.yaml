@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: token-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: token-api
+  template:
+    metadata:
+      labels:
+        app: token-api
+    spec:
+      nodeSelector:
+        Service: "token-api"
+        # Or alternatively: tier: "token-api"
+      containers:
+        - name: token-api
+          image: ap-tokyo-1.ocir.io/nreio7apu7z0/develop-token-api:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: oci-config
+              mountPath: /app/.oci
+              readOnly: true
+            - name: oci-config
+              mountPath: /root/.oci
+              readOnly: true
+          env:
+            - name: OCI_CONFIG_FILE
+              value: /app/.oci/config
+            - name: OCI_CLI_KEY_FILE
+              value: /app/.oci/oci_api_key.pem
+      volumes:
+        - name: oci-config
+          secret:
+            secretName: oci-config-secret
+      imagePullSecrets:
+        - name: ocir-secret
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: token-api-service
+spec:
+  selector:
+    app: token-api
+  ports:
+    - port: 80
+      targetPort: 80
